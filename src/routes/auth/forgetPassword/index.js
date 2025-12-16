@@ -1,7 +1,6 @@
 const Joi = require("joi");
 const crypto = require("crypto");
 const User = require("../../../model/user.model");
-const { sendEmail } = require("../../../helpers/email");
 const { sendResponse, messages } = require("../../../helpers/handleResponse");
 const userService = require("../../../service/dbService")({
     model: User

@@ -9,6 +9,7 @@ const orderRoute = require("./order");
 const userRoute = require("./user");
 const reviewRoute = require("./review");
 const paymentRoute = require("./payment");
+const emailRoute = require("./email");
 
 module.exports = (app) => {
     app.get("/", (req, res) => {
@@ -27,6 +28,7 @@ module.exports = (app) => {
     app.use("/v1/user", userRoute);
     app.use("/v1/review", reviewRoute);
     app.use("/v1/payment", paymentRoute);
+    app.use("/v1/email", emailRoute);
 
     app.use("/v1/upload", upload.single("image"), (req, res) => {
         if (!req.file) {
