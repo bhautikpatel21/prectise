@@ -7,6 +7,7 @@ const productService = require("../../../service/dbService")({
 
 exports.handler = async (req, res) => {
     try {
+        // Show ALL products (isShow: true or false) when accessed from navbar filter
         const products = await productService.getDocumentByQuery(
             {},
             [],

@@ -34,6 +34,7 @@ exports.handler = async (req, res) => {
             },
             // Unwind the product array (should be single product)
             { $unwind: "$product" },
+            // Don't filter by isShow - show ALL products when accessed from navbar filter
             // Replace root with product document, keeping orderCount for reference
             {
                 $replaceRoot: {

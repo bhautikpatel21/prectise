@@ -8,7 +8,8 @@ const view = require("./view");
 const cancel = require("./cancel");
 const returnOrder = require("./return");
 const getAll = require("./getAll");
-const getAllAdmin = require("./getAllAdmin");
+const getAllOrders = require("./getAllOrders");
+const customTShirt = require("./customTShirt");
 
 router.post(
     "/create",
@@ -48,10 +49,16 @@ router.get(
 );
 
 router.get(
-    "/getAllAdmin",
+    "/getAllOrders",
+    validator("query", getAllOrders.rule),
+    getAllOrders.handler
+);
+
+router.post(
+    "/customTShirt",
     authToken,
-    validator("query", getAllAdmin.rule),
-    getAllAdmin.handler
+    validator("body", customTShirt.rule),
+    customTShirt.handler
 );
 
 module.exports = router;

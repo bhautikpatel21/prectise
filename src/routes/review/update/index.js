@@ -6,11 +6,24 @@ const reviewService = require("../../../service/dbService")({
 });
 const { objectIdValidation } = require("../../../helpers/objectIdValidation");
 
+const path = require("path");
+
 exports.handler = async (req, res) => {
     try {
         const userId = req.user._id;
         const { id } = req.params;
-        const { rating, comment } = req.body;
+        // Handle both JSON and form-data
+        const rating = req.body.rating ? parseInt(req.body.rating) : undefined;
+        const comment = req.body.comment;
+        
+        // Handle uploaded images
+        let imagePaths = [];
+        if (req.files && req.files.length > 0) {
+            imagePaths = req.files.map(file => {
+                const imagePath = path.join("uploads", file.filename);
+                return imagePath.replace(path.sep, "/");
+            });
+        }
 
         // Check if review exists
         const existingReview = await reviewService.getDocumentById(id);
@@ -38,6 +51,10 @@ exports.handler = async (req, res) => {
         const updateData = {};
         if (rating !== undefined) updateData.rating = rating;
         if (comment !== undefined) updateData.comment = comment;
+        if (imagePaths.length > 0) {
+            // If new images are uploaded, replace existing images
+            updateData.images = imagePaths;
+        }
 
         // Update review
         const updatedReview = await reviewService.updateDocumentById(id, updateData);

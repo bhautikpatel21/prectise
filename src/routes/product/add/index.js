@@ -7,7 +7,7 @@ const productService = require("../../../service/dbService")({
 
 exports.handler = async (req, res) => {
     try {
-        const { title, description, mainImage, sideImages, sizes, price, category } = req.body;
+        const { title, description, mainImage, sideImages, sizes, price, category, isShow, proDes, shipingInfo, productCare } = req.body;
 
         const product = await productService.createDocument({
             title,
@@ -16,7 +16,11 @@ exports.handler = async (req, res) => {
             sideImages: sideImages || [],
             sizes: sizes || [],
             price,
-            category
+            category,
+            isShow: isShow !== undefined ? isShow : false,
+            proDes: proDes || '',
+            shipingInfo: shipingInfo || '',
+            productCare: productCare || ''
         });
 
         return sendResponse(
@@ -56,6 +60,18 @@ exports.rule = Joi.object({
     }),
     category: Joi.string().required().messages({
         "string.empty": "category is required"
+    }),
+    isShow: Joi.boolean().optional().messages({
+        "boolean.base": "isShow must be a boolean"
+    }),
+    proDes: Joi.string().optional().allow('').messages({
+        "string.base": "proDes must be a string"
+    }),
+    shipingInfo: Joi.string().optional().allow('').messages({
+        "string.base": "shipingInfo must be a string"
+    }),
+    productCare: Joi.string().optional().allow('').messages({
+        "string.base": "productCare must be a string"
     })
 }).unknown(false).messages({ 'object.unknown': '"{{#key}}" is not allowed' });
 

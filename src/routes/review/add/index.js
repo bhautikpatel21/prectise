@@ -1,4 +1,5 @@
 const Joi = require("joi");
+const path = require("path");
 const { sendResponse, messages } = require("../../../helpers/handleResponse");
 const Review = require("../../../model/review.model");
 const Product = require("../../../model/product.model");
@@ -13,7 +14,19 @@ const { objectIdValidation } = require("../../../helpers/objectIdValidation");
 exports.handler = async (req, res) => {
     try {
         const userId = req.user._id;
-        const { productId, rating, comment } = req.body;
+        // Handle both JSON and form-data
+        const productId = req.body.productId;
+        const rating = req.body.rating ? parseInt(req.body.rating) : undefined;
+        const comment = req.body.comment;
+        
+        // Handle uploaded images
+        let imagePaths = [];
+        if (req.files && req.files.length > 0) {
+            imagePaths = req.files.map(file => {
+                const imagePath = path.join("uploads", file.filename);
+                return imagePath.replace(path.sep, "/");
+            });
+        }
 
         // Verify product exists
         const product = await productService.getDocumentById(productId);
@@ -46,7 +59,8 @@ exports.handler = async (req, res) => {
             user: userId,
             product: productId,
             rating,
-            comment
+            comment,
+            images: imagePaths
         });
 
         // Populate user and product details

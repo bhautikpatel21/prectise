@@ -7,18 +7,24 @@ const productService = require("../../../service/dbService")({
 
 exports.handler = async (req, res) => {
     try {
-        const { pageNumber = 1, pageSize = 30, category, search } = req.query;
+        const { pageNumber = 1, pageSize = 30, category, search, showOnly } = req.query;
 
         let where = {};
         
+        // If showOnly is true (frontend request), only show products with isShow: true
+        // Admin panel won't send this parameter, so they see all products
+        if (showOnly === 'true') {
+            where.isShow = true;
+        }
+        
         if (category) {
-            where.category = { $regex: category, $options: "i" };
+            // Use exact match (case-insensitive) to prevent "shirt" from matching "t-shirt"
+            where.category = { $regex: `^${category}$`, $options: "i" };
         }
 
         if (search) {
             where.$or = [
                 { title: { $regex: search, $options: "i" } },
-                { description: { $regex: search, $options: "i" } }
             ];
         }
 
@@ -53,6 +59,9 @@ exports.rule = Joi.object({
     pageNumber: Joi.number().integer().min(1).optional(),
     pageSize: Joi.number().integer().min(1).max(100).optional(),
     category: Joi.string().optional(),
-    search: Joi.string().optional()
+    search: Joi.string().optional(),
+    showOnly: Joi.string().valid('true', 'false').optional().messages({
+        "any.only": "showOnly must be 'true' or 'false'"
+    })
 }).unknown(false).messages({ 'object.unknown': '"{{#key}}" is not allowed' });
 

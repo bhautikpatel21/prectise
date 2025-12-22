@@ -4,7 +4,7 @@ const orderItemSchema = new mongoose.Schema({
     product: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Product',
-        required: true
+        required: false // Optional for custom orders
     },
     quantity: {
         type: Number,
@@ -18,6 +18,10 @@ const orderItemSchema = new mongoose.Schema({
     price: {
         type: Number,
         required: true
+    },
+    customData: {
+        type: mongoose.Schema.Types.Mixed,
+        default: null
     }
 }, {
     _id: true
@@ -124,7 +128,12 @@ const orderSchema = new mongoose.Schema({
             type: String,
             trim: true
         }
-    }]
+    }],
+
+    isCustomOrder: {
+        type: Boolean,
+        default: false
+    }
 
 }, {
     versionKey: false,

@@ -9,7 +9,7 @@ const { objectIdValidation } = require("../../../helpers/objectIdValidation");
 exports.handler = async (req, res) => {
     try {
         const { id } = req.params;
-        const { title, description, mainImage, sideImages, sizes, price, category } = req.body;
+        const { title, description, mainImage, sideImages, sizes, price, category, isShow, proDes, shipingInfo, productCare } = req.body;
 
         const existingProduct = await productService.getDocumentById(id);
 
@@ -30,6 +30,10 @@ exports.handler = async (req, res) => {
         if (sizes !== undefined) updateData.sizes = sizes;
         if (price !== undefined) updateData.price = price;
         if (category !== undefined) updateData.category = category;
+        if (isShow !== undefined) updateData.isShow = isShow;
+        if (proDes !== undefined) updateData.proDes = proDes;
+        if (shipingInfo !== undefined) updateData.shipingInfo = shipingInfo;
+        if (productCare !== undefined) updateData.productCare = productCare;
 
         const updatedProduct = await productService.updateDocumentById(id, updateData);
 
@@ -75,6 +79,18 @@ exports.rule = Joi.object({
     }),
     category: Joi.string().optional().messages({
         "string.empty": "category cannot be empty"
+    }),
+    isShow: Joi.boolean().optional().messages({
+        "boolean.base": "isShow must be a boolean"
+    }),
+    proDes: Joi.string().optional().allow('').messages({
+        "string.base": "proDes must be a string"
+    }),
+    shipingInfo: Joi.string().optional().allow('').messages({
+        "string.base": "shipingInfo must be a string"
+    }),
+    productCare: Joi.string().optional().allow('').messages({
+        "string.base": "productCare must be a string"
     })
 }).unknown(false).messages({ 'object.unknown': '"{{#key}}" is not allowed' });
 

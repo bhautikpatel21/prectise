@@ -41,6 +41,29 @@ const productSchema = new mongoose.Schema({
         trim: true
     },
 
+    isShow: {
+        type: Boolean,
+        default: false
+    },
+
+    proDes: {
+        type: String,
+        default: '',
+        trim: true
+    },
+
+    shipingInfo: {
+        type: String,
+        default: '',
+        trim: true
+    },
+
+    productCare: {
+        type: String,
+        default: '',
+        trim: true
+    },
+
 }, {
     versionKey: false,
     timestamps: true
