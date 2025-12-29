@@ -57,12 +57,12 @@ exports.handler = async (req, res) => {
         const currentDate = new Date();
         const daysDifference = (currentDate - orderDate) / (1000 * 60 * 60 * 24);
 
-        if (daysDifference > 3) {
+        if (daysDifference > 1) {
             return sendResponse(
                 res,
                 null,
                 400,
-                messages.badRequest("Order can only be canceled within 3 days of placement.")
+                messages.badRequest("Order can only be canceled within 24 hours of placement.")
             );
         }
 

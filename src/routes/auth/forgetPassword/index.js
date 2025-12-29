@@ -6,7 +6,7 @@ const userService = require("../../../service/dbService")({
     model: User
 });
 const { hash } = require("../../../helpers/hash");
-
+const { sendEmail } = require("../../../helpers/email");
 // Helper to generate random token
 const generateToken = () => {
     return crypto.randomBytes(32).toString("hex");
@@ -50,7 +50,7 @@ exports.sendForgetPasswordOtp = async (req, res) => {
         await userService.updateDocumentById(user._id, { resetToken, resetOtp, resetOtpExpiresAt, resetOtpSendAttempts: newSendAttempts });
 
         // Email subject
-        const subject = "🔐 Reset Your Password OTP - The Sea Horse";
+        const subject = "🔐 Reset Your Password OTP - The Wolf Street";
 
         // HTML email body with OTP
         const html = `
@@ -59,7 +59,7 @@ exports.sendForgetPasswordOtp = async (req, res) => {
                     <h2 style="color: #333;">Password Reset OTP</h2>
                     <p style="color: #555;">Hello ${user.name || "User"},</p>
                     <p style="color: #555;">
-                        We received a request to reset your password for your <strong>The Sea Horse</strong> account.
+                        We received a request to reset your password for your <strong>The Wolf Street</strong> account.
                         Use the OTP below to reset your password:
                     </p>
                     <div style="font-size: 32px; font-weight: bold; color: #4f46e5; letter-spacing: 5px; margin: 20px 0;">
@@ -228,16 +228,16 @@ exports.resendForgetPasswordOtp = async (req, res) => {
         });
 
         // Email subject
-        const subject = "🔐 Reset Your Password OTP - Kalyana Vedika";
+        const subject = "🔐 Reset Your Password OTP - The Sea Horse";
 
         // HTML email body with OTP
         const html = `
             <div style="font-family: Arial, sans-serif; background-color: #f9fafb; padding: 30px; text-align: center;">
                 <div style="max-width: 500px; margin: auto; background: white; border-radius: 10px; padding: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
                     <h2 style="color: #333;">Password Reset OTP</h2>
-                    <p style="color: #555;">Hello ${user.firstName || "User"},</p>
+                    <p style="color: #555;">Hello ${user.name || "User"},</p>
                     <p style="color: #555;">
-                        We received a request to reset your password for your <strong>Kalyana Vedika</strong> account.
+                        We received a request to reset your password for your <strong>The Sea Horse</strong> account.
                         Use the OTP below to reset your password:
                     </p>
                     <div style="font-size: 32px; font-weight: bold; color: #4f46e5; letter-spacing: 5px; margin: 20px 0;">
@@ -268,5 +268,4 @@ exports.resendForgetPasswordOtp = async (req, res) => {
 };
 
 exports.resendForgetPasswordOtp.rule = Joi.object({}).unknown(false).messages({ 'object.unknown': '"{{#key}}" is not allowed' });
-
 

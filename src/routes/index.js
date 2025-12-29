@@ -10,11 +10,18 @@ const userRoute = require("./user");
 const reviewRoute = require("./review");
 const paymentRoute = require("./payment");
 const emailRoute = require("./email");
+const homepageRoute = require("./homepage");
+const fshipRoute = require("./fship");
+
+// Admin routes
+const adminLogisticsRoute = require("./admin/logistics");
+const adminWarehouseRoute = require("./admin/warehouse");
+const adminCourierRoute = require("./admin/courier");
 
 module.exports = (app) => {
     app.get("/", (req, res) => {
         res.json({
-            message: "These are KalyanaVedika APIs",
+            message: "These are the wold streets APIs",
             apiHealth: "Good",
             apiVersion: "V1.0.0",
         });
@@ -29,6 +36,13 @@ module.exports = (app) => {
     app.use("/v1/review", reviewRoute);
     app.use("/v1/payment", paymentRoute);
     app.use("/v1/email", emailRoute);
+    app.use("/v1/homepage", homepageRoute);
+    app.use("/v1/fship", fshipRoute);
+
+    // Admin routes for F-Ship logistics
+    app.use("/v1/admin/logistics", adminLogisticsRoute);
+    app.use("/v1/admin/warehouse", adminWarehouseRoute);
+    app.use("/v1/admin/courier", adminCourierRoute);
 
     app.use("/v1/upload", upload.single("image"), (req, res) => {
         if (!req.file) {

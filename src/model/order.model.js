@@ -110,9 +110,108 @@ const orderSchema = new mongoose.Schema({
         type: Date
     },
 
+    shippedAt: {
+        type: Date
+    },
+
+    deliveredAt: {
+        type: Date
+    },
+
     deliveryPartner: {
         type: String,
         trim: true
+    },
+
+    // F-Ship specific fields
+    fshipOrderId: {
+        type: Number,
+        // API order ID from F-Ship
+    },
+
+    awbNumber: {
+        type: String,
+        trim: true,
+        // Airway bill number from F-Ship
+    },
+
+    routeCode: {
+        type: String,
+        trim: true
+    },
+
+    courierId: {
+        type: Number,
+        // F-Ship courier ID
+    },
+
+    pickupOrderId: {
+        type: Number,
+        // Pickup order ID from register pickup API
+    },
+
+    shipmentWeight: {
+        type: Number,
+        min: 0
+    },
+
+    shipmentLength: {
+        type: Number,
+        min: 0
+    },
+
+    shipmentWidth: {
+        type: Number,
+        min: 0
+    },
+
+    shipmentHeight: {
+        type: Number,
+        min: 0
+    },
+
+    volumetricWeight: {
+        type: Number,
+        min: 0
+    },
+
+    paymentMode: {
+        type: String,
+        enum: ['COD', 'PREPAID'],
+        default: 'PREPAID'
+    },
+
+    codAmount: {
+        type: Number,
+        default: 0,
+        min: 0
+    },
+
+    expressType: {
+        type: String,
+        enum: ['air', 'surface'],
+        default: 'surface'
+    },
+
+    isNdd: {
+        type: Boolean,
+        default: false
+    },
+
+    warehouseId: {
+        type: Number,
+        // Reference to warehouse used for pickup
+    },
+
+    fshipStatus: {
+        type: String,
+        enum: ['not_created', 'created', 'pickup_registered', 'shipped', 'delivered', 'cancelled', 'returned'],
+        default: 'not_created'
+    },
+
+    fshipResponse: {
+        type: mongoose.Schema.Types.Mixed,
+        // Store full F-Ship API response for debugging
     },
 
     statusHistory: [{
@@ -125,6 +224,10 @@ const orderSchema = new mongoose.Schema({
             default: Date.now
         },
         note: {
+            type: String,
+            trim: true
+        },
+        fshipStatus: {
             type: String,
             trim: true
         }

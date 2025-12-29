@@ -35,8 +35,12 @@ exports.handler = async (req, res) => {
             );
         }
 
-        order.paymentStatus = 'paid';
-        order.status = 'confirmed'; // Update order status to confirmed after payment
+        // Only mark as paid for prepaid orders, COD orders should remain unpaid
+        if (order.paymentMode === 'PREPAID') {
+            order.paymentStatus = 'paid';
+        } else if (order.paymentMode === 'COD') {
+            order.paymentStatus = 'unpaid';
+        }
         await order.save();
 
         return sendResponse(

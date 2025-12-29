@@ -4,18 +4,27 @@ const validator = require("../../helpers/validator");
 const { authToken } = require("../../middleware/auth.middleware");
 
 const create = require("./create");
+const buyNow = require("./buyNow");
 const view = require("./view");
 const cancel = require("./cancel");
 const returnOrder = require("./return");
 const getAll = require("./getAll");
 const getAllOrders = require("./getAllOrders");
 const customTShirt = require("./customTShirt");
+const deleteOrder = require("./delete");
 
 router.post(
     "/create",
     authToken,
     validator("body", create.rule),
     create.handler
+);
+
+router.post(
+    "/buyNow",
+    authToken,
+    validator("body", buyNow.rule),
+    buyNow.handler
 );
 
 router.get(
@@ -59,6 +68,12 @@ router.post(
     authToken,
     validator("body", customTShirt.rule),
     customTShirt.handler
+);
+
+router.delete(
+    "/delete/:id",
+    validator("params", deleteOrder.rule),
+    deleteOrder.handler
 );
 
 module.exports = router;

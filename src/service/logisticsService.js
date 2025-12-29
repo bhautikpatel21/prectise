@@ -1,5 +1,6 @@
 const { sendEmail } = require("../helpers/email");
 const Order = require("../model/order.model");
+const fshipService = require("./fshipService");
 
 class LogisticsService {
     // Update order status and add to history
@@ -105,7 +106,7 @@ class LogisticsService {
                 <li>Status: ${status}</li>
             </ul>
             <br>
-            <p>Best regards,<br>KalyanaVedika Team</p>
+            <p>Best regards,<br>The World Streets Team</p>
         `;
 
         try {

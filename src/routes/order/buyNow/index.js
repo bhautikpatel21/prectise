@@ -1,65 +1,63 @@
 const Joi = require("joi");
 const { sendResponse, messages } = require("../../../helpers/handleResponse");
 const Order = require("../../../model/order.model");
-const Cart = require("../../../model/cart.model");
 const Product = require("../../../model/product.model");
 const orderService = require("../../../service/dbService")({
     model: Order
 });
-const cartService = require("../../../service/dbService")({
-    model: Cart
-});
 const productService = require("../../../service/dbService")({
     model: Product
 });
+const { objectIdValidation } = require("../../../helpers/objectIdValidation");
 
 exports.handler = async (req, res) => {
     try {
         const userId = req.user._id;
-        const { shippingAddress, paymentMethod } = req.body;
+        const { productId, quantity, size, shippingAddress, paymentMethod } = req.body;
 
-        // Get user's cart
-        const cart = await Cart.findOne({ user: userId }).populate('items.product');
-
-        if (!cart || !cart.items || cart.items.length === 0) {
+        // Validate productId
+        if (!objectIdValidation(productId)) {
             return sendResponse(
                 res,
                 null,
                 400,
-                messages.badRequest("Cart is empty. Please add items to cart before placing an order.")
+                messages.badRequest("Invalid product ID")
             );
         }
 
-        // Calculate total amount and prepare order items
-        let totalAmount = 0;
-        const orderItems = [];
+        // Verify product exists
+        const product = await productService.getDocumentById(productId);
+        if (!product) {
+            return sendResponse(
+                res,
+                null,
+                404,
+                messages.recordNotFound("Product not found.")
+            );
+        }
 
-        for (const item of cart.items) {
-            const product = item.product;
-            if (!product) {
+        // Check if size is valid (if product has sizes)
+        if (size && product.sizes && product.sizes.length > 0) {
+            if (!product.sizes.includes(size)) {
                 return sendResponse(
                     res,
                     null,
-                    404,
-                    messages.recordNotFound(`Product not found for item ${item._id}`)
+                    400,
+                    messages.badRequest(`Invalid size. Available sizes: ${product.sizes.join(", ")}`)
                 );
             }
-
-            const itemPrice = product.price * item.quantity;
-            totalAmount += itemPrice;
-
-            orderItems.push({
-                product: product._id,
-                quantity: item.quantity,
-                size: item.size || null,
-                price: product.price
-            });
         }
 
-        // Add shipping cost for COD orders (₹90), prepaid has free shipping
-        if (paymentMethod === 'cod') {
-            totalAmount += 90;
-        }
+        // Calculate total amount
+        const totalAmount = product.price * (quantity || 1);
+
+        // Create order item for single product
+        const orderItems = [{
+            product: product._id,
+            quantity: quantity || 1,
+            size: size || null,
+            price: product.price
+        }];
 
         // Create order
         const order = await orderService.createDocument({
@@ -68,17 +66,8 @@ exports.handler = async (req, res) => {
             totalAmount,
             shippingAddress,
             status: 'pending',
-            orderDate: new Date(),
-            paymentMode: paymentMethod === 'cod' ? 'COD' : 'PREPAID',
-            expressType: 'surface', // Default
-            shipmentWeight: 1, // Default weight in kg
-            shipmentLength: 10, // Default dimensions in cm
-            shipmentWidth: 10,
-            shipmentHeight: 10
+            orderDate: new Date()
         });
-
-        // Clear cart after order creation
-        await cartService.updateDocumentById(cart._id, { items: [] });
 
         // Populate order details
         const populatedOrder = await Order.findById(order._id)
@@ -98,6 +87,11 @@ exports.handler = async (req, res) => {
 };
 
 exports.rule = Joi.object({
+    productId: Joi.string().required().messages({
+        "string.empty": "productId is required"
+    }),
+    quantity: Joi.number().integer().min(1).optional().default(1),
+    size: Joi.string().optional().allow(null),
     shippingAddress: Joi.string().required().messages({
         "string.empty": "shippingAddress is required"
     }),

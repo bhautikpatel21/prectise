@@ -44,9 +44,14 @@ exports.handler = async (req, res) => {
             );
         }
 
+        // Calculate product amount (excluding shipping)
+        const productAmount = order.items.reduce((total, item) => {
+            return total + (item.price * item.quantity);
+        }, 0);
+
         // Create Razorpay order
         const options = {
-            amount: order.totalAmount * 100, // amount in paisa
+            amount: productAmount * 100, // amount in paisa (product price only)
             currency: "INR",
             receipt: `order_${order._id}`,
             payment_capture: 1, // auto capture
